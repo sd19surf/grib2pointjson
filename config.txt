@@ -1,0 +1,8 @@
+my $filepath = "C:\\ColdFusion2016\\cfusion\\wwwroot\\grib\\";
+my $filename = "GLOBAL.grib2.2020031812.";
+my @fhours = qw("0000" "0006" "0012" "0018" "0024" "0030" "0036" "0042" "0048" "0054" "0060" "0066" "0072" "0078" "0084" "0090" "0096" "0102" "0108" "0114" "0120" "0126" "0132" "0138" "0144" "0150");
+my $station_list = "C:\\Coldfusion2016\\cfusion\\wwwroot\\grib\\station_list_shrt.csv";
+
+
+
+
