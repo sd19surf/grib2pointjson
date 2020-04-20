@@ -1,6 +1,6 @@
 
-use Time::Piece;
-use Time::Seconds;
+#use Time::Piece;
+#use Time::Seconds;
 use Benchmark;
 use threads;
 use Thread::Queue qw( );
@@ -17,28 +17,29 @@ use Thread::Semaphore;
 
 #################################################################################################
 ## Read in a config file
-## built for 557th ensembles only
+## built for grib files to produce point json files with variable names, times, and values
+## removed need for Time::Pieces
 #################################################################################################
 
 
 ###TEMP VARIABLES UNTIL CONFIG
 ###Still needs work to have a decent config file reader.
 
-my $config_file = $ARGV[0];
+#my $config_file = $ARGV[0];
 #
-if (open(my $fh, '<:encoding(UTF-8)', $config_file)) {
-  while (my $row = <$fh>) {
-    eval $row;
-  }
-} else {
-  warn "Could not open file '$config_file' $!";
-};
+#if (open(my $fh, '<:encoding(UTF-8)', $config_file)) {
+#  while (my $row = <$fh>) {
+#    eval $row;
+#  }
+#} else {
+#  warn "Could not open file '$config_file' $!";
+#};
 ####################################################################################################################
 
 ####################################################################################################################
 ##TEMP Variables listing until I get the config read in running better
 my $filepath = "C:\\ColdFusion2016\\cfusion\\wwwroot\\grib\\";
-my $station_list = "C:\\Coldfusion2016\\cfusion\\wwwroot\\grib\\station_list_shrt.csv";
+my $station_list = "station_list_shrt.csv";
 #my @fhours = qw("0000" "0006" "0012" "0018" "0024" "0030" "0036" "0042" "0048" "0054" "0060" "0066" "0072" "0078" "0084" "0090" "0096" "0102" "0108" "0114" "0120" "0126" "0132" "0138" "0144" "0150");
 #my $filename = "GLOBAL.grib2.2020032000.";
 #my $filename = "gfs.t12z.pgrb2.0p25.f";
@@ -52,7 +53,7 @@ if ($filename != ''){
   }
 }else{
 opendir(DIR, ".");
-@files = grep(/\.grb$/,readdir(DIR));
+@files = grep(/^GLOBAL\./,readdir(DIR));
 closedir(DIR);
 }
 
@@ -143,6 +144,14 @@ foreach my $line (split /\n+/, $output){
 
 }
 
+sub checkFileType(){
+my $file = @_[0];
+
+my $fileinfo = qx(wgrib2 "$file" -vt -t);
+
+
+}
+
 sub createKey(){
 my $rawKey;
 my $newKey;
@@ -154,18 +163,22 @@ $rawKey = $_;
 return $newKey;
 }
 
+
 sub getTime(){
 my $value;
 my $rawValue;
     foreach(@_){
         $rawValue = $_;
     }
-    $value = (split /=/,$rawValue)[1]; 
-my $format = '%Y%m%d%H';
-my $new_format = '%Y-%m-%dT%H:00';
-my $dt = Time::Piece->strptime($value,$format);
-my $new_dt = $dt->strftime($new_format);
- return $new_dt;  
+    $value = (split/=/,$rawValue)[1];
+    $year = substr $value, 0, 4; 
+    $mon = substr $value, 4, 2;
+    $day = substr $value, 6, 2;
+    $hour = substr $value, 8, 2;
+ 
+$datestring = $year.'-'.$mon.'-'.$day.'T'.$hour.':00';
+
+return $datestring;
 }
 
 sub getValue(){
